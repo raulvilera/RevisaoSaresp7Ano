@@ -1,4 +1,6 @@
 import { Cartas, QuizImagem } from "@/components/Jogos";
+import { Identificacao } from "@/components/Identificacao";
+import { Aluno as AlunoT } from "@/data/turmas";
 import { GameKind, JOGO_NOME, TEMAS } from "@/data/temas";
 import { useLiberados } from "@/lib/store";
 import { ArrowLeft, Lock, Star } from "lucide-react";
@@ -9,6 +11,7 @@ export default function Aluno() {
   const { lib } = useLiberados();
   const [temaId, setTemaId] = useState<string | null>(null);
   const [jogo, setJogo] = useState<GameKind | null>(null);
+  const [quem, setQuem] = useState<{ turma: string; a: AlunoT } | null>(null);
   const tema = TEMAS.find(t => t.id === temaId);
 
   return (
@@ -16,10 +19,13 @@ export default function Aluno() {
       <header className="flex items-center gap-3 px-5 py-3 border-b border-ink/10 bg-white/70">
         <Link href="/" className="flex items-center gap-1 text-sm hover:underline"><ArrowLeft size={16} /> Início</Link>
         <h1 className="font-display text-2xl">Arena do Aluno</h1>
-        {tema && <button onClick={() => { setTemaId(null); setJogo(null); }} className="ml-auto text-sm px-3 py-1.5 rounded-full border bg-white">Trocar tema</button>}
+        {quem && <span className="ml-auto text-sm text-right leading-tight"><b>{quem.a.nome}</b><br />{quem.turma} · Nº {quem.a.n}</span>}
+        {quem && <button onClick={() => { setQuem(null); setTemaId(null); setJogo(null); }} className="text-sm px-3 py-1.5 rounded-full border bg-white">Sair</button>}
+        {tema && <button onClick={() => { setTemaId(null); setJogo(null); }} className="text-sm px-3 py-1.5 rounded-full border bg-white">Trocar tema</button>}
       </header>
       <main className="max-w-5xl mx-auto p-5">
-        {!tema && (
+        {!quem && <Identificacao onIniciar={(turma, a) => setQuem({ turma, a })} />}
+        {quem && !tema && (
           <>
             <p className="mb-4 opacity-80">Escolha um tema liberado pelo professor.</p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

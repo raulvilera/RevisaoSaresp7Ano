@@ -1,5 +1,5 @@
 import { TEMAS } from "@/data/temas";
-import { GraduationCap, Presentation } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
@@ -17,8 +17,7 @@ export default function Home() {
             O professor apresenta cada tema em telas lado a lado, com imagens e termos que abrem explicações ampliadas e arrastáveis. Depois, libera os jogos de associação para a turma.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <Link href="/professor" className="flex items-center gap-2 px-6 py-3 rounded-full bg-brand text-white text-lg shadow-lg hover:-translate-y-0.5 transition"><Presentation /> Modo Aula (professor)</Link>
-            <Link href="/aluno" className="flex items-center gap-2 px-6 py-3 rounded-full bg-white border-2 border-brand text-brand text-lg hover:-translate-y-0.5 transition"><GraduationCap /> Arena do Aluno</Link>
+            <Link href="/aluno" className="flex items-center gap-2 px-8 py-4 rounded-full bg-brand text-white text-xl shadow-lg hover:-translate-y-0.5 transition"><GraduationCap /> Arena do Aluno</Link>
           </div>
         </div>
         <ol className="space-y-2">
