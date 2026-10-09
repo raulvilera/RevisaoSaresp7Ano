@@ -1,5 +1,5 @@
 import { TEMAS } from "@/data/temas";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Presentation } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
@@ -18,6 +18,7 @@ export default function Home() {
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link href="/aluno" className="flex items-center gap-2 px-8 py-4 rounded-full bg-brand text-white text-xl shadow-lg hover:-translate-y-0.5 transition"><GraduationCap /> Arena do Aluno</Link>
+            <Link href="/professor" className="flex items-center gap-2 px-8 py-4 rounded-full border-2 border-brand text-brand bg-white text-xl hover:-translate-y-0.5 transition"><Presentation /> Área do Professor</Link>
           </div>
         </div>
         <ol className="space-y-2">

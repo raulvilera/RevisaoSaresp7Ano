@@ -8,7 +8,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 
 export default function Aluno() {
-  const { lib } = useLiberados();
+  const { lib, erro } = useLiberados();
   const [temaId, setTemaId] = useState<string | null>(null);
   const [jogo, setJogo] = useState<GameKind | null>(null);
   const [quem, setQuem] = useState<{ turma: string; a: AlunoT } | null>(null);
@@ -28,6 +28,7 @@ export default function Aluno() {
         {quem && !tema && (
           <>
             <p className="mb-4 opacity-80">Escolha um tema liberado pelo professor.</p>
+            {erro && <p role="alert" className="mb-4 text-sm text-red-700">{erro}</p>}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {TEMAS.map(t => {
                 const ok = lib.includes(t.id);

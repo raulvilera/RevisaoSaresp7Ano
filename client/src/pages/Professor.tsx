@@ -1,17 +1,22 @@
 import { FloatWindow, Janela } from "@/components/FloatWindow";
+import { ProfessorGate } from "@/components/ProfessorGate";
 import { TEMAS, Tema } from "@/data/temas";
 import { useLiberados } from "@/lib/store";
-import { ArrowLeft, ArrowLeftRight, ChevronLeft, ChevronRight, Lock, Unlock } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, ChevronLeft, ChevronRight, Lock, LogOut, Unlock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 
 export default function Professor() {
+  return <ProfessorGate>{(sair, email) => <Painel sair={sair} email={email} />}</ProfessorGate>;
+}
+
+function Painel({ sair, email }: { sair: () => void; email: string }) {
   const [ordem, setOrdem] = useState<Tema[]>(TEMAS);
   const [ini, setIni] = useState(0);
   const [vis, setVis] = useState(2);
   const [janelas, setJanelas] = useState<Janela[]>([]);
   const [zTop, setZTop] = useState(100);
-  const { lib, toggle, setAll } = useLiberados();
+  const { lib, toggle, setAll, erro } = useLiberados();
 
   const max = Math.max(0, ordem.length - vis);
   const go = (d: number) => setIni(i => Math.min(max, Math.max(0, i + d)));
@@ -58,7 +63,10 @@ export default function Professor() {
         <button onClick={() => setAll(TEMAS.map(t => t.id))} className="px-3 py-1.5 rounded-full bg-brand text-white text-sm">Liberar todos</button>
         <button onClick={() => setAll([])} className="px-3 py-1.5 rounded-full border text-sm bg-white">Bloquear todos</button>
         {janelas.length > 0 && <button onClick={() => setJanelas([])} className="px-3 py-1.5 rounded-full border text-sm bg-white">Fechar janelas ({janelas.length})</button>}
+        <span className="text-xs opacity-60 hidden md:inline">{email}</span>
+        <button onClick={sair} className="flex items-center gap-1 px-3 py-1.5 rounded-full border text-sm bg-white"><LogOut size={14} /> Sair</button>
       </header>
+      {erro && <div role="alert" className="px-5 py-2 text-sm bg-red-50 text-red-800 border-b border-red-200">{erro}</div>}
 
       <div className="relative flex-1 min-h-0">
         <button onClick={() => go(-1)} disabled={ini === 0} className="nav-btn left-2"><ChevronLeft size={32} /></button>
