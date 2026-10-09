@@ -1,24 +1,45 @@
-import { Item, TEMAS, Tema } from "@/data/temas";
+import { GameKind, Item, TEMAS, Tema } from "@/data/temas";
+import { calcularNota, formatarNota, mensagem } from "@/lib/nota";
+import { Quem, registrarResultado } from "@/lib/resultados";
 import { shuffle } from "@/lib/store";
 import { CheckCircle2, RotateCcw, XCircle } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const TODAS_IMG = TEMAS.flatMap(t => t.itens.filter(i => i.img));
 
-function Resultado({ acertos, total, onRestart, cor }: { acertos: number; total: number; onRestart: () => void; cor: string }) {
-  const pct = Math.round((acertos / total) * 100);
-  const msg = pct >= 80 ? "Excelente! Pronto para o SARESP." : pct >= 50 ? "Bom caminho! Revise os erros." : "Vamos revisar o tema e tentar de novo.";
+function Resultado({ nota, detalhe, onRestart, cor, salvar }: { nota: number; detalhe: string; onRestart: () => void; cor: string; salvar?: () => Promise<boolean> }) {
+  const [estado, setEstado] = useState<"salvando" | "ok" | "erro" | null>(salvar ? "salvando" : null);
+  const enviado = useRef(false);
+  const enviar = async () => {
+    if (!salvar) return;
+    setEstado("salvando");
+    setEstado((await salvar()) ? "ok" : "erro");
+  };
+  useEffect(() => {
+    if (enviado.current) return;
+    enviado.current = true;
+    enviar();
+  }, []);
   return (
     <div className="text-center py-10">
-      <div className="font-display text-6xl" style={{ color: cor }}>{acertos}/{total}</div>
-      <p className="text-xl mt-2">{msg}</p>
+      <div className="text-sm uppercase tracking-widest opacity-60">Sua nota</div>
+      <div className="font-display text-7xl" style={{ color: cor }}>{formatarNota(nota)}</div>
+      <p className="opacity-70 mt-1">{detalhe}</p>
+      <p className="text-xl mt-3">{mensagem(nota)}</p>
+      {estado === "salvando" && <p className="mt-3 text-sm opacity-70">Registrando sua nota…</p>}
+      {estado === "ok" && <p className="mt-3 text-sm text-emerald-700">Nota registrada para o professor ✓</p>}
+      {estado === "erro" && (
+        <p role="alert" className="mt-3 text-sm text-rose-700">
+          Não foi possível registrar a nota. <button onClick={enviar} className="underline font-semibold">Tentar de novo</button>
+        </p>
+      )}
       <button onClick={onRestart} className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-white" style={{ background: cor }}><RotateCcw size={18} /> Jogar novamente</button>
     </div>
   );
 }
 
 /** Imagem → Termo  e  Termo → Imagem */
-export function QuizImagem({ tema, itens, inverso }: { tema: Tema; itens: Item[]; inverso: boolean }) {
+export function QuizImagem({ tema, itens, inverso, quem }: { tema: Tema; itens: Item[]; inverso: boolean; quem?: Quem }) {
   const [seed, setSeed] = useState(0);
   const perguntas = useMemo(() => shuffle(itens.filter(i => i.img)).map(alvo => {
     const pool = itens.filter(i => i.img && i.id !== alvo.id);
@@ -31,7 +52,20 @@ export function QuizImagem({ tema, itens, inverso }: { tema: Tema; itens: Item[]
   const [acertos, setAcertos] = useState(0);
 
   const reiniciar = () => { setSeed(s => s + 1); setIdx(0); setEsc(null); setAcertos(0); };
-  if (idx >= perguntas.length) return <Resultado acertos={acertos} total={perguntas.length} onRestart={reiniciar} cor={tema.cor} />;
+  if (idx >= perguntas.length) {
+    const jogo: GameKind = inverso ? "inverso" : "imagem";
+    const total = perguntas.length;
+    return (
+      <Resultado
+        key={seed}
+        nota={calcularNota({ jogo, acertos, total })}
+        detalhe={`${acertos} de ${total} questões corretas`}
+        onRestart={reiniciar}
+        cor={tema.cor}
+        salvar={quem ? () => registrarResultado(quem, { tema_id: tema.id, jogo, acertos, total }) : undefined}
+      />
+    );
+  }
   const { alvo, opcoes } = perguntas[idx];
   const escolher = (id: string) => { if (esc) return; setEsc(id); if (id === alvo.id) setAcertos(a => a + 1); };
 
@@ -73,7 +107,7 @@ export function QuizImagem({ tema, itens, inverso }: { tema: Tema; itens: Item[]
 }
 
 /** Cartas: memória termo ↔ significado */
-export function Cartas({ tema, itens }: { tema: Tema; itens: Item[] }) {
+export function Cartas({ tema, itens, quem }: { tema: Tema; itens: Item[]; quem?: Quem }) {
   const [seed, setSeed] = useState(0);
   const cartas = useMemo(() => {
     const sel = shuffle(itens).slice(0, 6);
@@ -97,7 +131,18 @@ export function Cartas({ tema, itens }: { tema: Tema; itens: Item[] }) {
     }
   };
   const reiniciar = () => { setSeed(s => s + 1); setAbertas([]); setFeitas([]); setTent(0); };
-  if (feitas.length === pares) return <Resultado acertos={pares} total={tent} onRestart={reiniciar} cor={tema.cor} />;
+  if (feitas.length === pares) {
+    return (
+      <Resultado
+        key={seed}
+        nota={calcularNota({ jogo: "cartas", acertos: pares, total: pares, tentativas: tent })}
+        detalhe={`${pares} pares encontrados em ${tent} tentativas`}
+        onRestart={reiniciar}
+        cor={tema.cor}
+        salvar={quem ? () => registrarResultado(quem, { tema_id: tema.id, jogo: "cartas", acertos: pares, total: pares, tentativas: tent }) : undefined}
+      />
+    );
+  }
 
   return (
     <div>

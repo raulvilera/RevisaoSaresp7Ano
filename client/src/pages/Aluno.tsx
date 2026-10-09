@@ -13,6 +13,7 @@ export default function Aluno() {
   const [jogo, setJogo] = useState<GameKind | null>(null);
   const [quem, setQuem] = useState<{ turma: string; a: AlunoT } | null>(null);
   const tema = TEMAS.find(t => t.id === temaId);
+  const identidade = quem ? { turma: quem.turma, n: quem.a.n, nome: quem.a.nome } : undefined;
 
   return (
     <div className="min-h-screen paper">
@@ -64,7 +65,7 @@ export default function Aluno() {
               <h2 className="font-display text-2xl flex-1">{tema.titulo} · <span style={{ color: tema.cor }}>{JOGO_NOME[jogo]}</span></h2>
               <button onClick={() => setJogo(null)} className="text-sm underline">Outro jogo</button>
             </div>
-            {jogo === "cartas" ? <Cartas key={tema.id} tema={tema} itens={tema.itens} /> : <QuizImagem key={tema.id + jogo} tema={tema} itens={tema.itens} inverso={jogo === "inverso"} />}
+            {jogo === "cartas" ? <Cartas key={tema.id} tema={tema} itens={tema.itens} quem={identidade} /> : <QuizImagem key={tema.id + jogo} tema={tema} itens={tema.itens} inverso={jogo === "inverso"} quem={identidade} />}
           </div>
         )}
       </main>

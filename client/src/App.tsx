@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Professor from "./pages/Professor";
 import Aluno from "./pages/Aluno";
+import Relatorio from "./pages/Relatorio";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -14,6 +15,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/professor"} component={Professor} />
+      <Route path={"/professor/relatorio"} component={Relatorio} />
       <Route path={"/aluno"} component={Aluno} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

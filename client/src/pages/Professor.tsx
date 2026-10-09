@@ -2,7 +2,7 @@ import { FloatWindow, Janela } from "@/components/FloatWindow";
 import { ProfessorGate } from "@/components/ProfessorGate";
 import { TEMAS, Tema } from "@/data/temas";
 import { useLiberados } from "@/lib/store";
-import { ArrowLeft, ArrowLeftRight, ChevronLeft, ChevronRight, Lock, LogOut, Unlock } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, BarChart3, ChevronLeft, ChevronRight, Lock, LogOut, Unlock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 
@@ -63,6 +63,7 @@ function Painel({ sair, email }: { sair: () => void; email: string }) {
         <button onClick={() => setAll(TEMAS.map(t => t.id))} className="px-3 py-1.5 rounded-full bg-brand text-white text-sm">Liberar todos</button>
         <button onClick={() => setAll([])} className="px-3 py-1.5 rounded-full border text-sm bg-white">Bloquear todos</button>
         {janelas.length > 0 && <button onClick={() => setJanelas([])} className="px-3 py-1.5 rounded-full border text-sm bg-white">Fechar janelas ({janelas.length})</button>}
+        <Link href="/professor/relatorio" className="flex items-center gap-1 px-3 py-1.5 rounded-full border text-sm bg-white"><BarChart3 size={14} /> Relatório</Link>
         <span className="text-xs opacity-60 hidden md:inline">{email}</span>
         <button onClick={sair} className="flex items-center gap-1 px-3 py-1.5 rounded-full border text-sm bg-white"><LogOut size={14} /> Sair</button>
       </header>
