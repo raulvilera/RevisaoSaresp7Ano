@@ -83,6 +83,9 @@ begin
 end;
 $$;
 
+-- A função do gatilho não deve ser chamável pela API pública.
+revoke all on function public.bloquear_cadastro_nao_autorizado() from public, anon, authenticated;
+
 drop trigger if exists bloquear_cadastro on auth.users;
 create trigger bloquear_cadastro
   before insert on auth.users
